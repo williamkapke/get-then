@@ -10,7 +10,7 @@ var get = module.exports = function (url, headers, data, method, attempt = 0) {
   if(module.exports.agent && !options.headers['User-Agent'])
     options.headers['User-Agent'] = module.exports.agent
 
-  debug('%s $s', url, options.method)
+  debug(url, options.method)
   if (data) {
     data = JSON.stringify(data)
     headers[ 'Content-Length' ] = Buffer.byteLength(data)
@@ -23,9 +23,9 @@ var get = module.exports = function (url, headers, data, method, attempt = 0) {
       res.on('close', reject)
       req.on('error', reject)
       res.on('end', function () {
-        debug('%s %s', res.statusCode, res.statusMessage)
+        debug(res.statusCode, res.statusMessage)
         if (/301|302/.test(res.statusCode) && res.headers.location && attempt < 5) {
-          return get(res.headers.location, headers, data, method, ++attempt)
+          return accept(get(res.headers.location, headers, data, method, ++attempt))
         }
         var result = Buffer.concat(chunks)
         result.statusCode = res.statusCode
