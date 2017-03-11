@@ -1,6 +1,6 @@
 {
   "name": "get-then",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Give a URL, Get a Buffer.",
   "main": "get.js",
   "scripts": {
@@ -26,5 +26,8 @@
   "bugs": {
     "url": "https://github.com/williamkapke/get-then/issues"
   },
-  "homepage": "https://github.com/williamkapke/get-then"
+  "homepage": "https://github.com/williamkapke/get-then",
+  "dependencies": {
+    "debug": "^2.6.2"
+  }
 }

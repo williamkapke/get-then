@@ -2,7 +2,7 @@ get-then
 ========
 
 Give a URL, Get a Buffer.<br>
-<sup>~40 lines of code</sup>
+<sup>less than 50 lines of code!</sup>
 
 ```js
 var get = require('get-then')

@@ -1,14 +1,16 @@
 var http = require('http')
 var https = require('https')
 var url_parse = require('url').parse
+var debug = require('debug')('get-then')
 
-var get = module.exports = function (url, headers, data, method) {
+var get = module.exports = function (url, headers, data, method, attempt = 0) {
   var options = url_parse(url)
   options.method = method ? method : data ? 'POST' : 'GET'
   options.headers = headers || {}
   if(module.exports.agent && !options.headers['User-Agent'])
     options.headers['User-Agent'] = module.exports.agent
 
+  debug('%s $s', url, options.method)
   if (data) {
     data = JSON.stringify(data)
     headers[ 'Content-Length' ] = Buffer.byteLength(data)
@@ -21,13 +23,17 @@ var get = module.exports = function (url, headers, data, method) {
       res.on('close', reject)
       req.on('error', reject)
       res.on('end', function () {
-        var data = Buffer.concat(chunks)
-        data.statusCode = res.statusCode
-        data.statusMessage = res.statusMessage
-        data.headers = res.headers
+        debug('%s %s', res.statusCode, res.statusMessage)
+        if (/301|302/.test(res.statusCode) && res.headers.location && attempt < 5) {
+          return get(res.headers.location, headers, data, method, ++attempt)
+        }
+        var result = Buffer.concat(chunks)
+        result.statusCode = res.statusCode
+        result.statusMessage = res.statusMessage
+        result.headers = res.headers
 
         var happy = res.statusCode <= 200 || res.statusCode < 300
-        return happy ? accept(data) : reject(data)
+        return happy ? accept(result) : reject(result)
       })
     })
     .on('error', reject)
